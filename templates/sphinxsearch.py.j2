@@ -4,7 +4,7 @@
 
 from datadog_checks.base import AgentCheck
 from datadog_checks.base.utils.subprocess_output import get_subprocess_output
-
+from datetime import datetime, timedelta
 
 class getsphinxdata(AgentCheck):
 
@@ -12,9 +12,17 @@ class getsphinxdata(AgentCheck):
 
         sphinxout, err, retcode = get_subprocess_output(['/opt/sphinxsearch/bin/searchd', '--status', '--config', '/etc/sphinxsearch/searchd.conf'], self.log, raise_on_empty_output=True)
 
+
 {% for metric in sphinx_metrics %}
+	### {{ metric }} ###
         {{ metric }} = sphinxout.split('{{ metric }}:',1)[1]
         {{ metric }} = {{ metric }}.split("\n")[0]
         {{ metric }} = {{ metric }}.strip()
         self.gauge("sphinxsearch.{{ metric }}", {{ metric }}, tags=['TAG_KEY:TAG_VALUE'])
+	if {{ metric }} = 'uptime:':
+	  sec = timedelta(seconds=int({{ metric }}))
+          d = datetime(1,1,1) + sec
+	  self.gauge("sphinxsearch.uptime.days", d.day-1, tags=['TAG_KEY:TAG_VALUE'])
+          self.gauge("sphinxsearch.uptime.hours", d.hour-1, tags=['TAG_KEY:TAG_VALUE'])
+          self.gauge("sphinxsearch.uptime.minutes", d.minute-1, tags=['TAG_KEY:TAG_VALUE'])
 {% endfor %}

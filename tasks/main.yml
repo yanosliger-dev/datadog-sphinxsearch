@@ -1,0 +1,34 @@
+---
+
+- name: Make directory for {{ agent_name }} in conf.d
+  file:
+    path: "/etc/datadog-agent/conf.d/{{ agent_name }}.d"
+    owner: dd-agent
+    group: dd-agent
+    state: directory
+
+- name: add dd-agent to the sphinxsearch group
+  user:
+    name: dd-agent
+    groups: sphinxsearch
+    append: yes
+
+- name: Add config file to conf.d in Datadog for {{ agent_name }}
+  template:
+    src: "{{ agent_name }}.yaml.j2"
+    dest: "/etc/datadog-agent/conf.d/{{ agent_name }}.d/{{ agent_name }}.yaml"
+    force: no
+    owner: dd-agent
+    group: dd-agent
+  notify:
+    - restart datadog-agent
+
+- name: Add to checks
+  template:
+    src: "{{ agent_name }}.py.j2"
+    dest: "/etc/datadog-agent/checks.d/{{ agent_name }}.py"
+    owner: dd-agent
+    group: dd-agent
+    force: no
+  notify:
+    - restart datadog-agent

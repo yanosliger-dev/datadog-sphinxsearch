@@ -1,0 +1,10 @@
+---
+### defaults
+agent_name: sphinxsearch
+adm_group_required: True
+sphinx_metrics:
+  - uptime
+  - connections
+  - query_wall
+  - queries
+  - sql_select

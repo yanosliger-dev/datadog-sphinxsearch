@@ -1,0 +1,20 @@
+### sphinxsearch metrics for datadog by yanosliger
+# This file is managed by ansible changes should be made in the template to be permanent
+#
+
+from datadog_checks.base import AgentCheck
+from datadog_checks.base.utils.subprocess_output import get_subprocess_output
+
+
+class getsphinxdata(AgentCheck):
+
+    def check(self, instance):
+
+        sphinxout, err, retcode = get_subprocess_output(['/opt/sphinxsearch/bin/searchd', '--status', '--config', '/etc/sphinxsearch/searchd.conf'], self.log, raise_on_empty_output=True)
+
+{% for metric in sphinx_metrics %}
+        {{ metric }} = sphinxout.split('{{ metric }}:',1)[1]
+        {{ metric }} = {{ metric }}.split("\n")[0]
+        {{ metric }} = {{ metric }}.strip()
+        self.gauge("sphinxsearch.{{ metric }}", {{ metric }}, tags=['TAG_KEY:TAG_VALUE'])
+{% endfor %}

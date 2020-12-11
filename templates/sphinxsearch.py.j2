@@ -12,6 +12,16 @@ class getsphinxdata(AgentCheck):
 
         sphinxout, err, retcode = get_subprocess_output(['/opt/sphinxsearch/bin/searchd', '--status', '--config', '/etc/sphinxsearch/searchd.conf'], self.log, raise_on_empty_output=True)
 
+	#uptime is always going to be reported its 1 constant
+	uptime = sphinxout.split('uptime:',1)[1]
+	uptime = uptime.split("\n")[0]
+	uptime = uptime.strip()
+	sec = timedelta(seconds=int({{ metric }}))
+        d = datetime(1,1,1) + sec
+        self.gauge("sphinxsearch.uptime.days", d.day-1, tags=['TAG_KEY:TAG_VALUE'])
+        self.gauge("sphinxsearch.uptime.hours", d.hour-1, tags=['TAG_KEY:TAG_VALUE'])
+        self.gauge("sphinxsearch.uptime.minutes", d.minute-1, tags=['TAG_KEY:TAG_VALUE'])
+
 
 {% for metric in sphinx_metrics %}
 	### {{ metric }} ###
@@ -19,10 +29,4 @@ class getsphinxdata(AgentCheck):
         {{ metric }} = {{ metric }}.split("\n")[0]
         {{ metric }} = {{ metric }}.strip()
         self.gauge("sphinxsearch.{{ metric }}", {{ metric }}, tags=['TAG_KEY:TAG_VALUE'])
-	if {{ metric }} = 'uptime:':
-	  sec = timedelta(seconds=int({{ metric }}))
-          d = datetime(1,1,1) + sec
-	  self.gauge("sphinxsearch.uptime.days", d.day-1, tags=['TAG_KEY:TAG_VALUE'])
-          self.gauge("sphinxsearch.uptime.hours", d.hour-1, tags=['TAG_KEY:TAG_VALUE'])
-          self.gauge("sphinxsearch.uptime.minutes", d.minute-1, tags=['TAG_KEY:TAG_VALUE'])
 {% endfor %}

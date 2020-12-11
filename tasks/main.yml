@@ -30,6 +30,5 @@
     force: yes
     owner: dd-agent
     group: dd-agent
-    force: no
   notify:
     - restart datadog-agent

@@ -4,6 +4,13 @@ agent_name: sphinxsearch
 adm_group_required: True
 sphinx_metrics:
   - connections
+  - command_search
+  - command_update
+  - command_status
   - query_wall
   - queries
   - sql_select
+  - qcache_max_bytes
+  - attrindex_thresh
+  - sql_show_meta
+  - sql_update
